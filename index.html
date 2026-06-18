@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <title>จับฉลากปีใหม่</title>
+    <link
+      href="assets/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="assets/css/random.css"
+      rel="stylesheet"
+    />
+    <link
+      href="assets/css/fonts.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  </head>
+  <body>
+    <!-- เนื้อหาเดิมคงเดิม แต่เพิ่ม class และ style ใหม่ -->
+    <div id="confetti-container"></div>
+
+    <div class="container-fluid py-5" style="overflow-y: hidden">
+      <div class="row">
+        <!-- sidebar -->
+        <div
+          id="sidebar"
+          class="col-auto"
+          style="width: 300px; transition: all 0.3s ease"
+          >
+          <div class="prize-box">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h3><i class="fas fa-file-import"></i> นำเข้ารายชื่อ</h3>
+              <button
+                class="btn btn-sm btn-outline-light"
+                onclick="toggleSection('importSection')"
+              >
+                <i class="fas fa-chevron-up" id="importSectionIcon"></i>
+              </button>
+            </div>
+            <div id="importSection">
+              <input
+                type="file"
+                class="form-control mb-3"
+                id="fileInput"
+                accept=".xlsx, .xls"
+              />
+              <button class="btn btn-primary w-100" onclick="loadNames()">
+                <i class="fas fa-upload"></i> นำเข้ารายชื่อ
+              </button>
+            </div>
+          </div>
+
+          <div class="prize-box">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h3><i class="fas fa-gift"></i> ตั้งค่ารางวัล</h3>
+              <button
+                class="btn btn-sm btn-outline-light"
+                onclick="toggleSection('prizeSection')"
+              >
+                <i class="fas fa-chevron-up" id="prizeSectionIcon"></i>
+              </button>
+            </div>
+            <div id="prizeSection">
+              <div class="mb-3">
+                <input
+                  type="text"
+                  class="form-control mb-2"
+                  id="prizeName"
+                  placeholder="ชื่อรางวัล"
+                />
+                <input
+                  type="number"
+                  class="form-control mb-2"
+                  id="prizeCount"
+                  placeholder="จำนวนรางวัล"
+                />
+                <button class="btn btn-success w-100" onclick="addPrize()">
+                  <i class="fas fa-plus-circle"></i> เพิ่มรางวัล
+                </button>
+              </div>
+              <div id="prizeList" class="mt-3">
+                <!-- Prize list will be displayed here -->
+              </div>
+            </div>
+          </div>
+
+          <div class="prize-box">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h3><i class="fas fa-random"></i> สุ่มรางวัล</h3>
+              <button
+                class="btn btn-sm btn-outline-light"
+                onclick="toggleSection('randomSection')"
+              >
+                <i class="fas fa-chevron-up" id="randomSectionIcon"></i>
+              </button>
+            </div>
+            <div id="randomSection">
+              <select
+                class="form-select mb-3"
+                id="prizeSelect"
+                onchange="updateCurrentPrizeDisplay(); clean_PrizeDisplay();"
+              >
+                <option value="">เลือกรางวัล</option>
+              </select>
+              <div class="mb-3">
+                <label class="form-label">ระยะเวลาในการสุ่ม (วินาที)</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="spinDuration"
+                  value="2"
+                  min="1"
+                  max="10"
+                  step="0.5"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="prize-box">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h3><i class="fas fa-music"></i> เพลงประกอบ</h3>
+              <button
+                class="btn btn-sm btn-outline-light"
+                onclick="toggleSection('musicSection')"
+              >
+                <i class="fas fa-chevron-up" id="musicSectionIcon"></i>
+              </button>
+            </div>
+            <div id="musicSection">
+              <div class="mb-3">
+                <label class="form-label">เพลงประกอบการสุ่ม</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="bgMusicInput"
+                  accept="audio/*"
+                />
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <button class="btn btn-sm btn-primary" id="playPauseBgMusic">
+                    <i class="fas fa-play"></i>
+                  </button>
+                  <input
+                    type="range"
+                    class="form-range"
+                    id="bgMusicVolume"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value="0"
+                  />
+                  <span id="bgMusicVolumeValue">100%</span>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">เพลงปรบมือ</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="applauseMusicInput"
+                  accept="audio/*"
+                />
+                <div class="d-flex align-items-center gap-2">
+                  <button class="btn btn-sm btn-primary" id="playPauseApplause">
+                    <i class="fas fa-play"></i>
+                  </button>
+                  <input
+                    type="range"
+                    class="form-range"
+                    id="applauseMusicVolume"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value="0"
+                  />
+                  <span id="applauseMusicVolumeValue">100%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="prize-box">
+            <div class="d-flex gap-2">
+            <button class="btn btn-info w-100" onclick="exportWinners()">
+              <i class="fas fa-file-export"></i> Export รายชื่อผู้โชคดี
+            </button>
+            <button class="btn btn-success flex-grow-1" onclick="showWinnersCarousel()">
+              <i class="fas fa-play-circle"></i> รันรายชื่อผู้โชคดี
+            </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- รันโชว์ชื่อผู้โชคดี -->
+        <div class="modal fade" id="winnersCarouselModal" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">รายชื่อผู้โชคดีทั้งหมด</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div id="winnersGrid" class="winners-grid">
+                  <!-- Winners will be displayed here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col" id="mainContent" style="transition: all 0.3s ease">
+          <div class="header-container">
+            <h1 class="new-year-title">
+              <span class="icon-star"><i class="fas fa-star"></i></span>
+              <span class="text-gradient">จับฉลากปีใหม่</span>
+              <span class="icon-star"><i class="fas fa-star"></i></span>
+            </h1>
+            <div class="text-center" id="currentPrizeDisplay"></div>
+          </div>
+
+          <div class="prize-box"
+            style="height: calc(70vh);"
+          >
+            <div class="row"  >
+              <div class="col-md-9 text-center" style= "height: calc(10vh)";>
+                 
+                <div
+                class="name-display mb-4"
+                id="nameDisplay"
+                style="font-size: 4.5rem;height: 130%;"
+              ></div>
+              <div
+                class="name-display mb-5"
+                id="additionalInfo"
+                style="font-size: 3.5rem; color: #ffd700;"
+              ></div>
+              
+
+            </div> 
+            <div class="col-md-3">
+              <div style="color: #ffd700; font-size: 30px;">รายชื่อผู้โชคดี</div> 
+            <div class="winner-list">
+              <ol  id="list_winner" style="height: calc(75vh - 200px); width: 100%;" >
+              </ol>
+          </div>
+        </div>  
+
+         <div class="text-center">
+          <button
+                class="btn btn-warning btn-lg mt-auto mx-auto button"
+                style="font-size: 2rem; padding: 1rem 3rem;  
+                position: absolute; top: 70%;left: 38%;transform: translate(-50%, -50%)"
+                onclick="startRandom()"
+              >
+                <i class="fas fa-dice"></i> สุ่มรางวัล
+              </button>
+          </div>  
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Generic Modal -->
+    <div class="modal fade" id="alertModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title text-dark">
+              <i class="fas fa-bell"></i> แจ้งเตือน
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body text-dark">
+            <p id="alertMessage"></p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              ปิด
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <audio id="bgMusic" src="Wham Last Christmas Lyrics.mp3"></audio>
+    <audio id="applauseMusic" src="เอฟเฟคท์_เสียง_ปรบมือ.mp3"></audio>
+
+    <script src="assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/xlsx.full.min.js"></script>
+    <script src="assets/js/sweetalert2.js"></script>
+
+    <script>
+      let names = [];           //list ชื่อคน
+      let additionalInfo = [];  //list ชื่อหน่วยงาน
+      let prizes = [];
+      let winners = [];
+      let usedNames = new Set();
+      let isFirstSelection = true;
+      const bgMusic = document.getElementById("bgMusic");
+      const applauseMusic = document.getElementById("applauseMusic");
+      let isSpinning = false;
+      let currentPrizeIndex = null;
+      const alertModal = new bootstrap.Modal(
+        document.getElementById("alertModal")
+      );
+      // เพิ่มตัวแปรสำหรับเก็บไฟล์เสียงที่อัปโหลด
+      let customBgMusic = null;
+      let customApplauseMusic = null;
+      let bgMusicPausedTime = 0;
+      let carouselInterval;
+      let currentSpeed = 2000; // Default speed (normal)
+
+      // เพิ่มตัวแปรสำหรับเก็บค่าระดับเสียงเดิม
+      let originalBgMusicVolume = 1;
+      let isPlaying = false;
+
+      //นำเข้ารายชื่อ
+      function loadNames() {
+        const fileInput = document.getElementById("fileInput");
+        const file = fileInput.files[0];
+        //ถ้าไม่มีไฟล์ แจ้งเตือน
+        if (!file) {
+          showAlert("กรุณาเลือกไฟล์ Excel");
+          return;
+        }
+        //ถ้ามีไฟล์ อ่านไฟล์
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: "array" });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+          // ตรวจสอบข้อมูลที่อ่านมาใน jsonData
+          // console.log(jsonData); // ดูข้อมูลที่ถูกอ่านจากไฟล์ Excel
+
+          // ตรวจสอบข้อมูลที่อ่านมา
+          names = jsonData.slice(1).map((row) => {
+            // console.log(row); // ตรวจสอบข้อมูลแต่ละแถว
+            return row[1] || ""; // อ่านข้อมูลจากคอลัมน์ที่ 2
+          });
+
+          additionalInfo = jsonData.slice(1).map((row) => {
+            // console.log(row); // ตรวจสอบข้อมูลแต่ละแถว
+            return row[2] || ""; // อ่านข้อมูลจากคอลัมน์ที่ 3
+          });
+
+          // Show success message with name list
+          showNameList();
+          // showAlert(`นำเข้ารายชื่อสำเร็จ ${names.length} รายการ`);
+        };
+        reader.readAsArrayBuffer(file);
+
+      //  clean_localStorage();
+      }
+      window.addEventListener('load', () => {
+        load_localStorage();
+      });
+
+
+      //แสดงรายชื่อ
+      function showNameList() {
+        // Create modal content
+        let modalContent = `
+            <div class="modal fade" id="nameListModal" tabindex="-1">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-dark">รายชื่อทั้งหมด (${names.length} รายการ)</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ลำดับ</th>
+                                            <th>ชื่อ</th>
+                                            <th>หน่วยงาน</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+        `;
+
+        names.forEach((name, index) => {
+          // ตรวจสอบว่า additionalInfo มีค่าและไม่เป็น undefined
+          const info = additionalInfo[index]
+            ? additionalInfo[index]
+            : "ข้อมูลไม่ครบ";
+
+          modalContent += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${name}</td>
+                    <td>${info}</td>
+                </tr>
+            `;
+        });
+
+        modalContent += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Remove existing modal if any
+        const existingModal = document.getElementById("nameListModal");
+        if (existingModal) {
+          existingModal.remove();
+        }
+
+        // Add modal to document
+        document.body.insertAdjacentHTML("beforeend", modalContent);
+
+        // Show modal
+        const nameListModal = new bootstrap.Modal(
+          document.getElementById("nameListModal")
+        );
+        nameListModal.show();
+      }
+
+      //เพิ่มรางวัล
+      function addPrize() {
+        const prizeName = document.getElementById("prizeName").value;
+        const prizeCount = parseInt(
+          document.getElementById("prizeCount").value
+        );
+        //ถ้าไม่มีชื่อหรือจำนวนรางวัล แจ้งเตือน
+        if (!prizeName || !prizeCount) {
+          showAlert("กรุณากรอกชื่อรางวัลและจำนวนรางวัลให้ครบถ้วน");
+          return;
+        }
+
+        prizes.push({
+          name: prizeName,
+          count: prizeCount,
+          winners: [],
+        });
+
+        // Clear input fields
+        document.getElementById("prizeName").value = "";
+        document.getElementById("prizeCount").value = "";
+
+        // Update prize displays
+        updatePrizeList();
+        updatePrizeSelect();
+        updateCurrentPrizeDisplay();
+      }
+      //แสดงรายชื่อรางวัล
+      function updatePrizeList() {
+        const prizeList = document.getElementById("prizeList");
+        prizeList.innerHTML = "";
+
+        prizes.forEach((prize, index) => {
+          const remainingCount = prize.count - prize.winners.length;
+          const prizeElement = document.createElement("div");
+          prizeElement.className = "mb-2 p-2 bg-light text-dark rounded";
+          prizeElement.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${prize.name}</strong>
+                        <br>
+                        <small>เหลือ ${remainingCount} รางวัล</small>
+                    </div>
+                    <button class="btn btn-sm btn-danger" onclick="deletePrize(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+          prizeList.appendChild(prizeElement);
+        });
+      }
+      //อัพเดทรางวัล
+      function updatePrizeSelect() {
+        const prizeSelect = document.getElementById("prizeSelect");
+        const currentValue = prizeSelect.value; // เก็บค่าที่เลือกไว้ปัจจุบัน
+
+        prizeSelect.innerHTML = '<option value="">เลือกรางวัล</option>';
+
+        prizes.forEach((prize, index) => {
+          const remainingCount = prize.count - prize.winners.length;
+          // แสดงรางวัลทั้งหมด แต่ disable ตัวเลือกที่หมดแล้ว
+          const isDisabled = remainingCount <= 0;
+          prizeSelect.innerHTML += `
+                <option value="${index}" 
+                    ${isDisabled ? "disabled" : ""} 
+                    ${currentValue == index ? "selected" : ""}>
+                    ${prize.name} (เหลือ ${remainingCount} รางวัล)
+                    ${isDisabled ? " - หมดแล้ว" : ""}
+                </option>
+            `;
+        });
+
+        // ถ้ารางวัลที่เลือกอยู่หมดแล้ว ให้รีเซ็ตการเลือก
+        const selectedPrize = prizes[currentValue];
+        if (
+          selectedPrize &&
+          selectedPrize.count - selectedPrize.winners.length <= 0
+        ) {
+          prizeSelect.value = "";
+        }
+      }
+      //ลบรางวัล
+      function deletePrize(index) {
+        if (confirm("คุณต้องการลบรางวัลนี้ใช่หรือไม่?")) {
+          prizes.splice(index, 1);
+          updatePrizeList();
+          updatePrizeSelect();
+        }
+      }
+
+      // อัพเดทฟังก์ชัน updateCurrentPrizeDisplay เพื่อไม่ให้เคลียร์การแสดงผลเมื่อเลือกรางวัล
+      function updateCurrentPrizeDisplay() {
+        const prizeSelect = document.getElementById("prizeSelect");
+        const display = document.getElementById("currentPrizeDisplay");
+
+        if (prizeSelect.value === "") {
+          display.innerHTML = "กรุณาเลือกรางวัล";
+          return;
+        }
+        const selectedPrize = prizes[prizeSelect.value];
+        const remainingCount =
+          selectedPrize.count - selectedPrize.winners.length;
+
+        display.innerHTML = `
+        <div>
+            <h1><span class='text-gradient2'>${selectedPrize.name}</span></h1>
+            <div class='fs-5'>จำนวนรางวัลทั้งหมด: ${selectedPrize.count} รางวัล / เหลือ: ${remainingCount} รางวัล</div>
+        </div>
+    `;
+      }
+      function clean_PrizeDisplay() {
+        document.getElementById("nameDisplay").innerHTML = '';
+        document.getElementById("additionalInfo").innerHTML = '';
+        document.getElementById("list_winner").innerHTML = '';
+        
+        const prizeSelect = document.getElementById("prizeSelect");
+        const selectedPrize = prizes[prizeSelect.value];
+        update_list_winner(selectedPrize.winners);
+      }
+      function update_list_winner(arr) {
+      document.getElementById("list_winner").innerHTML = '';
+      const list_winner = document.getElementById("list_winner");
+    
+      // Add custom styles for the select element
+      list_winner.style.fontSize = "18px";
+      list_winner.style.fontWeight = "500";
+      list_winner.style.color = "#ffffff";
+      list_winner.style.padding = "30px";
+      list_winner.style.borderRadius = "8px";
+      
+    
+
+      arr.forEach(function callback(value, index) {
+        const option = document.createElement('li');
+        option.innerHTML = ` ${value['name']} ${value['info'] ?  `<br> ${value['info']}` : ''}`;
+        
+        option.style.padding = "8px";
+        list_winner.appendChild(option);
+      });
+      }
+
+
+      // อัพเดทฟังก์ชัน startRandom เพื่อให้แสดงชื่อเหมือนกันทุกครั้ง
+      async function startRandom() {
+        const prizeSelect = document.getElementById("prizeSelect");
+        const nameDisplay = document.getElementById("nameDisplay");
+        const additionalInfoDisplay = document.getElementById("additionalInfo");
+        const spinDuration =
+          parseFloat(document.getElementById("spinDuration").value) || 2;
+
+        // ตรวจสอบว่าได้เลือกรางวัลหรือยัง
+        if (prizeSelect.value === "") {
+          showAlert("กรุณาเลือกรางวัล");
+          return;
+        }
+
+        // ตรวจสอบว่ามีรายชื่อหรือยัง
+        if (names.length === 0) {
+          showAlert("กรุณานำเข้ารายชื่อก่อน");
+          return;
+        }
+
+        // ป้องกันการกดปุ่มซ้ำระหว่างกำลังสุ่ม
+        if (isSpinning) return;
+        isSpinning = true;
+
+        const selectedPrize = prizes[prizeSelect.value];
+        const remainingCount =
+          selectedPrize.count - selectedPrize.winners.length;
+
+        if (remainingCount <= 0) {
+          showAlert("รางวัลนี้ครบจำนวนแล้ว กรุณาเลือกรางวัลใหม่");
+          isSpinning = false;
+          return;
+        }
+
+        // เล่นเพลงประกอบการสุ่ม
+        bgMusic.play();
+        isPlaying = true;
+        updatePlayPauseButton('playPauseBgMusic', true);
+
+        nameDisplay.classList.add("spinning");
+        additionalInfoDisplay.classList.add("spinning");
+
+        const availableNames = names.filter(
+          (_, index) => !usedNames.has(index)
+        );
+
+        if (availableNames.length === 0) {
+          showAlert("รายชื่อหมดแล้ว");
+          isSpinning = false;
+          return;
+        }
+
+        // คำนวณจำนวนรอบและความเร็วในการสุ่มตามเวลาที่กำหนด
+        const totalSpins = spinDuration * 20;
+        const spinInterval = 1000 / 20;
+
+        let spinCount = 0;
+        const spinning = setInterval(() => {
+          const randomIndex = Math.floor(Math.random() * availableNames.length);
+          const displayIndex = names.indexOf(availableNames[randomIndex]);
+          nameDisplay.textContent = names[displayIndex];
+          additionalInfoDisplay.textContent =
+            additionalInfo[displayIndex] || "";
+          spinCount++;
+
+          if (spinCount >= totalSpins) {
+            clearInterval(spinning);
+            finishRandom(displayIndex, selectedPrize);
+          }
+        }, spinInterval);
+
+        // เมื่อการสุ่มเสร็จสิ้น ให้แสดงเอฟเฟกต์พลุและเฉลิมฉลอง
+        setTimeout(() => {
+          // เรียกใช้ฟังก์ชันแสดงเอฟเฟกต์พลุและเฉลิมฉลอง
+          showFireworks(
+            Math.random() * window.innerWidth,
+            Math.random() * window.innerHeight
+          );
+          showCongratsEffect(
+            Math.random() * window.innerWidth,
+            Math.random() * window.innerHeight
+          );
+        }, spinDuration * 1000); // เรียกใช้หลังจากที่การหมุนเสร็จสิ้น
+      }
+
+      // เริ่มต้นเมื่อโหลดหน้า
+      document.addEventListener("DOMContentLoaded", () => {
+        createFireflies();
+        // ... other initialization code ...
+      });
+
+      // แก้ไขฟังก์ชัน finishRandom
+      function finishRandom(winnerIndex, selectedPrize) {
+
+        // ลดระดับเสียงเพลงประกอบลงเหลือ 20% ของระดับเดิม
+        bgMusic.volume = originalBgMusicVolume * 0.2;
+
+        // Play applause sound
+        applauseMusic.currentTime = 0;
+        applauseMusic.play();
+
+        // เมื่อเพลงปรบมือจบ ให้เพิ่มระดับเสียงเพลงประกอบกลับมา
+        applauseMusic.onended = function() {
+        bgMusic.volume = originalBgMusicVolume;
+      };
+
+      // เพิ่ม Event Listener สำหรับการอัปโหลดเพลงใหม่
+      document.getElementById('bgMusicInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        bgMusic.src = url;
+        isPlaying = false;
+        updatePlayPauseButton('playPauseBgMusic', false);
+      }
+      });
+
+      document.getElementById('applauseMusicInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        applauseMusic.src = url;
+      }
+      });
+
+        const nameDisplay = document.getElementById("nameDisplay");
+        const additionalInfoDisplay = document.getElementById("additionalInfo");
+        nameDisplay.classList.remove("spinning");
+        additionalInfoDisplay.classList.remove("spinning");
+
+        selectedPrize.winners.push({
+          name: names[winnerIndex],
+          info: additionalInfo[winnerIndex] || "",
+        });
+        save_localStorage();
+        update_list_winner(selectedPrize.winners);
+
+        usedNames.add(winnerIndex);
+
+        updatePrizeList();
+        updatePrizeSelect();
+        updateCurrentPrizeDisplay();
+        save_localStorage();
+
+        isSpinning = false;
+
+        const remainingCount =
+          selectedPrize.count - selectedPrize.winners.length;
+        if (remainingCount === 0) {
+          setTimeout(() => {
+            showAlert("รางวัลนี้ครบจำนวนแล้ว กรุณาเลือกรางวัลใหม่");
+            document.getElementById("prizeSelect").value = "";
+            updateCurrentPrizeDisplay();
+          }, 1000);
+        }
+      }
+
+      //export รายชื่อผู้ชนะ เป็นไฟล์ excel
+      function exportWinners() {   
+        const winnerData = prizes.flatMap((prize) =>
+          prize.winners.map((winner) => ({
+            รางวัล: prize.name,
+            ผู้ชนะ: winner.name,
+            ข้อมูลเพิ่มเติม: winner.info,
+          }))
+        );
+
+        const worksheet = XLSX.utils.json_to_sheet(winnerData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Winners");
+        XLSX.writeFile(workbook, "winners.xlsx");
+      }
+
+      // เก็บสถานะการแสดง/ซ่อนของแต่ละส่วน
+      let sectionStates = {
+        importSection: true,
+        prizeSection: true,
+        randomSection: true,
+        musicSection: true,
+      };
+
+      // เก็บสถานะการแสดง/ซ่อนของ sidebar
+      let sidebarVisible = true;
+
+      // ฟังก์ชันสำหรับ toggle section
+      function toggleSection(sectionId) {
+        // ดึง elements ที่เกี่ยวข้อง
+        const section = document.getElementById(sectionId);
+        const icon = document.getElementById(`${sectionId}Icon`);
+
+        // สลับสถานะการแสดง/ซ่อน
+        sectionStates[sectionId] = !sectionStates[sectionId];
+
+        // ถ้าซ่อนอยู่ให้แสดง, ถ้าแสดงอยู่ให้ซ่อน
+        if (sectionStates[sectionId]) {
+          // แสดง section ด้วย animation
+          section.style.maxHeight = section.scrollHeight + "px";
+          section.style.opacity = "1";
+          section.style.transform = "translateY(0)";
+          // หมุนไอคอนขึ้น
+          icon.style.transform = "rotate(0deg)";
+        } else {
+          // ซ่อน section ด้วย animation
+          section.style.maxHeight = "0";
+          section.style.opacity = "0";
+          section.style.transform = "translateY(-10px)";
+          // หมุนไอคอนลง
+          icon.style.transform = "rotate(180deg)";
+        }
+      }
+
+      function showAlert(txt) {
+        Swal.fire({
+          text: txt,
+          showConfirmButton: false,
+          timer: 2000
+        })
+      } 
+
+      // ฟังก์ชันสำหรับ toggle sidebar
+      function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        const mainContent = document.getElementById("mainContent");
+        const toggleButton = document.querySelector(".sidebar-toggle");
+        const toggleIcon = document.getElementById("sidebarToggleIcon");
+        const contentContainer = document.getElementById("contentContainer");
+
+        sidebarVisible = !sidebarVisible;
+
+        if (sidebarVisible) {
+          // แสดง sidebar
+          sidebar.style = "display:block";
+          sidebar.style.width = "300px";
+          toggleButton.classList.remove("button-left");
+          toggleIcon.className = "fas fa-chevron-left";
+        } else {
+          // ซ่อน sidebar
+          sidebar.style = "display:none";
+          toggleButton.classList.add("button-left");
+          toggleIcon.className = "fas fa-chevron-right";
+        }
+      }
+
+      // เพิ่ม CSS สำหรับ animation
+      function addToggleStyles() {
+        const style = document.createElement("style");
+        style.textContent = `
+        #importSection,
+        #prizeSection,
+        #randomSection,
+        #musicSection {
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+            max-height: 1000px;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .fas.fa-chevron-up {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* สไตล์สำหรับ sidebar */
+        #sidebar {
+            transition: all 0.3s ease-in-out;
+            overflow: hidden;
+        }
+
+        #contentContainer {
+            display: flex;
+            transition: all 0.3s ease-in-out;
+            width: 100%;
+        }
+
+        #mainContent {
+            transition: all 0.3s ease-in-out;
+            flex-grow: 1;
+        }
+
+            .content-centered {
+            justify-content: center;
+        }
+
+        /* สไตล์สำหรับปุ่ม toggle */
+        .sidebar-toggle {
+            position: absolute;
+            top: 30px;
+            left: 10px;
+            transform: translateY(-50%);
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-toggle:hover {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+        }
+
+        /* สไตล์สำหรับปุ่มเมื่อ sidebar ถูกซ่อน */
+        .sidebar-toggle.button-left {
+            left: 0;
+        }
+    `;
+        document.head.appendChild(style);
+      }
+
+      // เรียกใช้ฟังก์ชันเพิ่ม style เมื่อโหลดหน้า
+      document.addEventListener("DOMContentLoaded", () => {
+        addToggleStyles();
+        // เพิ่มปุ่ม toggle sidebar
+        addSidebarToggleButton();
+      });
+
+      // ฟังก์ชันเพิ่มปุ่ม toggle sidebar
+      function addSidebarToggleButton() {
+        const button = document.createElement("button");
+        button.className = "sidebar-toggle";
+        button.onclick = toggleSidebar;
+        button.innerHTML ='<i id="sidebarToggleIcon" class="fas fa-chevron-left"></i>';
+        document.body.appendChild(button);
+      }
+
+      // อัพเดทปุ่มเล่น/หยุดเพลง
+    function updatePlayPauseButton(buttonId, isPlaying) {
+    const button = document.getElementById(buttonId);
+    const icon = button.querySelector('i');
+    icon.className = isPlaying ? 'fas fa-pause' : 'fas fa-play';
+      }
+
+      // เพิ่ม Event Listeners สำหรับควบคุมเพลงประกอบการสุ่ม
+    document.getElementById('playPauseBgMusic').addEventListener('click', function() {
+    if (bgMusic.paused) {
+        bgMusic.play();
+        isPlaying = true;
+    } else {
+        bgMusic.pause();
+        isPlaying = false;
+    }
+    updatePlayPauseButton('playPauseBgMusic', !bgMusic.paused);
+    });
+
+    // ควบคุมระดับเสียงเพลงประกอบการสุ่ม
+    document.getElementById('bgMusicVolume').addEventListener('input', function(e) {
+    const volume = parseFloat(e.target.value);
+    bgMusic.volume = volume;
+    originalBgMusicVolume = volume; // เก็บค่าระดับเสียงปัจจุบัน
+    document.getElementById('bgMusicVolumeValue').textContent = `${Math.round(volume * 100)}%`;
+    });
+
+    // ควบคุมระดับเสียงเพลงปรบมือ
+    document.getElementById('applauseMusicVolume').addEventListener('input', function(e) {
+    const volume = parseFloat(e.target.value);
+    applauseMusic.volume = volume;
+    document.getElementById('applauseMusicVolumeValue').textContent = `${Math.round(volume * 100)}%`;
+    });
+
+    // เพิ่ม Event Listener สำหรับการเล่นเพลงซ้ำ
+    bgMusic.addEventListener('ended', function() {
+    if (isPlaying) {
+        bgMusic.currentTime = 0;
+        bgMusic.play();
+    }
+    });
+
+      // Add firefly effect
+      function createFireflies() {
+        setInterval(() => {
+          const firefly = document.createElement("div");
+          firefly.className = "firefly";
+          firefly.style.left = `${Math.random() * 100}vw`;
+          firefly.style.top = `${Math.random() * 100}vh`;
+          document.body.appendChild(firefly);
+
+          setTimeout(() => firefly.remove(), 4000);
+        }, 200);
+      }
+
+      // ฟังก์ชันแสดงเอฟเฟกต์เฉลิมฉลอง
+      function showCongratsEffect(x, y) {
+        const celebrations = ["🎉", "🎊", "✨", "🎇", "🎆"];
+        const effect = document.createElement("div");
+        effect.className = "celebration-text";
+        effect.textContent =
+          celebrations[Math.floor(Math.random() * celebrations.length)];
+        effect.style.left = `${x}px`;
+        effect.style.top = `${y}px`;
+        document.body.appendChild(effect);
+
+        setTimeout(() => effect.remove(), 4000); // ให้แสดงเป็นเวลา 4 วินาที
+      }
+
+      // ฟังก์ชันแสดงเอฟเฟกต์พลุ
+      function showFireworks(x, y) {
+        const numFireworks = 20; // จำนวนพลุที่จะแสดง
+        const colors = ["#ff3333", "#33cc33", "#3399ff", "#ffcc33", "#ff66cc"];
+
+        // สร้างพลุหลายๆ ลูก
+        for (let i = 0; i < numFireworks; i++) {
+          const firework = document.createElement("div");
+          firework.className = "firework";
+          firework.style.left = `${x}px`;
+          firework.style.top = `${y}px`;
+
+          // สุ่มตำแหน่งและสีของพลุ
+          firework.style.backgroundColor =
+            colors[Math.floor(Math.random() * colors.length)];
+          firework.style.setProperty("--x", `${(Math.random() - 0.5) * 300}px`); // สุ่มทิศทาง X
+          firework.style.setProperty("--y", `${(Math.random() - 0.5) * 300}px`); // สุ่มทิศทาง Y
+
+          document.body.appendChild(firework);
+
+          // ลบพลุหลังจากการระเบิดเสร็จสิ้น
+          setTimeout(() => firework.remove(), 1500); // 1.5 วินาที
+        }
+      }
+
+      //เป็นการเก็บค่าถุงแม้จะปิดเว็บไปก็ยังอยู่จนกว่าจะ clear
+      function save_localStorage() {
+        //localStorage.setItem('prizes', JSON.stringify(prizes));
+      }
+      function load_localStorage() {
+        //if(localStorage.getItem('prizes')) {
+        //prizes = JSON.parse(localStorage.getItem('prizes'));
+       // }
+      }
+      function clean_localStorage() {
+       //localStorage.removeItem('prizes')
+      }
+
+      
+
+      function showWinnersCarousel() {
+        // Get all winners from all prizes
+        const modal = document.getElementById('winnersCarouselModal');
+        const winnersGrid = document.getElementById('winnersGrid');
+        
+        // Get all winners from all prizes
+        const allWinners = prizes.flatMap(prize => 
+          prize.winners.map(winner => ({
+            name: winner.name,
+            info: winner.info,
+            prize: prize.name
+          }))
+        );
+
+        if (allWinners.length === 0) {
+          showAlert("ยังไม่มีผู้โชคดี");
+          return;
+        }
+
+        // Show modal
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+
+        // Create winners grid layout
+        winnersGrid.innerHTML = allWinners.map(winner => `
+          <div class="winner-card">
+            <div class="prize-name">${winner.prize}</div>
+            <div class="winner-name">${winner.name}</div>
+            ${winner.info ? `<div class="winner-info">${winner.info}</div>` : ''}
+          </div>
+        `).join('');
+
+        // Start auto-scroll
+        startAutoScroll(winnersGrid);
+        }
+
+        function startAutoScroll(container) {
+        const scrollSpeed = 120; // Lower number means faster scrolling
+        let scrollStep = 1;
+
+        function scroll() {
+          container.scrollBy(0, scrollStep);
+          if (container.scrollTop + container.clientHeight >= container.scrollHeight) {
+            container.scrollTop = 0; // Reset to top when reaching the bottom
+          }
+          requestAnimationFrame(scroll);
+        }
+        
+        requestAnimationFrame(scroll);
+      }
+
+        // Function to update the display with animation
+        function updateDisplay() {
+          winnerDisplay.style.animation = 'none'; // Reset animation
+          winnerDisplay.offsetHeight; // Trigger reflow
+          winnerDisplay.style.animation = null; // Re-enable animation
+
+          const winner = allWinners[currentIndex];
+          winnerDisplay.innerHTML = `
+            <div class="carousel-item-animate">
+              ${winner.name}${winner.info ? `<br><span style="font-size: 0.8em; opacity: 0.8">${winner.info}</span>` : ''}
+            </div>
+          `;
+          winnerPrize.innerHTML = `
+            <div class="carousel-item-animate" style="color: #FF6B6B;">
+              ${winner.prize}
+            </div>
+          `;
+          currentIndex = (currentIndex + 1) % allWinners.length;
+        }
+
+        // Initial display
+        updateDisplay();
+
+        // Start the carousel
+        carouselInterval = setInterval(updateDisplay, currentSpeed);
+
+        // Speed control handler
+        document.getElementById('carouselSpeed').addEventListener('change', function(e) {
+          currentSpeed = parseInt(e.target.value);
+          if (carouselInterval) {
+            clearInterval(carouselInterval);
+            carouselInterval = setInterval(updateDisplay, currentSpeed);
+          }
+        });
+
+        // Clear interval when modal is closed
+        document.getElementById('winnersCarouselModal').addEventListener('hidden.bs.modal', function () {
+          if (carouselInterval) {
+            clearInterval(carouselInterval);
+          }
+        });
+    </script>
+  </body>
+</html>
